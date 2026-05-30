@@ -2,5 +2,7 @@
   "name": "Yehulushet Neurological Clinic Payroll",
   "description": "Professional payroll management system for Yehulushet Neurological Clinic, supporting specialized pay grades for medical staff in Ethiopia.",
   "requestFramePermissions": [],
-  "majorCapabilities": []
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

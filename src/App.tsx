@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Employee, EmployeeRole, MonthlyWorkLog, SalaryCalculation } from './types';
-import { generateMockEmployees, PAY_GRADES, DEPARTMENTS } from './constants';
+import { generateMockEmployees, PAY_GRADES, DEPARTMENTS, DEPARTMENT_PARAMETERS, DEPARTMENT_PARAMETERS_CONFIG } from './constants';
 import { calculateSalary, formatCurrency } from './services/payrollService';
 
 type View = 'dashboard' | 'employees' | 'payroll' | 'reports';
@@ -34,10 +34,10 @@ type View = 'dashboard' | 'employees' | 'payroll' | 'reports';
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [employees] = useState<Employee[]>(() => {
-    const saved = localStorage.getItem('medpay_employees');
+    const saved = localStorage.getItem('medpay_employees_v3');
     if (saved) return JSON.parse(saved);
     const generated = generateMockEmployees(300);
-    localStorage.setItem('medpay_employees', JSON.stringify(generated));
+    localStorage.setItem('medpay_employees_v3', JSON.stringify(generated));
     return generated;
   });
   const [searchTerm, setSearchTerm] = useState('');
@@ -377,6 +377,7 @@ export default function App() {
                     onCancel={() => setSelectedEmployeeId(null)}
                     selectedMonth={selectedMonth}
                     selectedYear={selectedYear}
+                    existingLogs={monthlyLogs[selectedEmployee!.id] || []}
                     onSave={(logData) => {
                       const newLog: MonthlyWorkLog = {
                         ...logData,
@@ -443,17 +444,17 @@ export default function App() {
                       <div className="space-y-4 text-sm font-medium">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded bg-orange-100 text-orange-600 flex items-center justify-center font-bold">1</div>
-                          <span>Dr. Abebe Bekele</span>
+                          <span>Dr. Kindu</span>
                           <span className="ml-auto font-mono text-orange-600">+42.5 hrs</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded bg-gray-100 text-gray-600 flex items-center justify-center font-bold">2</div>
-                          <span>Nurse Tigist Tesfaye</span>
+                          <span>Sr. Almaz</span>
                           <span className="ml-auto font-mono text-orange-600">+38.0 hrs</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded bg-gray-100 text-gray-600 flex items-center justify-center font-bold">3</div>
-                          <span>Dr. Elias Girma</span>
+                          <span>Dr. Samson</span>
                           <span className="ml-auto font-mono text-orange-600">+35.2 hrs</span>
                         </div>
                       </div>
@@ -478,7 +479,7 @@ export default function App() {
 }
 
 function EmployeeDetailsModal({ employee, onClose }: { employee: Employee, onClose: () => void }) {
-  const payGrade = PAY_GRADES.find(pg => pg.id === employee.payGradeId)!;
+  const payGrade = PAY_GRADES.find(pg => pg.id === employee.payGradeId) || PAY_GRADES[0];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -653,55 +654,108 @@ function MonthYearPicker({ selectedMonth, setSelectedMonth, selectedYear, setSel
   );
 }
 
-function PayrollForm({ employee, onCancel, onSave, selectedMonth: initialMonth, selectedYear: initialYear }: { employee: Employee, onCancel: () => void, onSave: (log: any) => void, selectedMonth: number, selectedYear: number }) {
-  const [log, setLog] = useState({
-    regularHours: 160,
-    overtimeHours: 0,
-    nightShifts: 0,
-    holidaysWorked: 0,
-    restDaysWorked: 0,
+function PayrollForm({ 
+  employee, 
+  onCancel, 
+  onSave, 
+  selectedMonth: initialMonth, 
+  selectedYear: initialYear,
+  existingLogs = []
+}: { 
+  employee: Employee, 
+  onCancel: () => void, 
+  onSave: (log: any) => void, 
+  selectedMonth: number, 
+  selectedYear: number,
+  existingLogs?: MonthlyWorkLog[]
+}) {
+  const deptParams = useMemo(() => {
+    return DEPARTMENT_PARAMETERS[employee.department] || DEPARTMENT_PARAMETERS['Others'] || [];
+  }, [employee.department]);
+  
+  const [log, setLog] = useState<Omit<MonthlyWorkLog, 'id' | 'employeeId' | 'status'>>({
+    parameters: deptParams.reduce((acc, param) => ({ ...acc, [param]: 0 }), {} as Record<string, number>),
     month: initialMonth,
     year: initialYear
   });
+
+  // Synced state retrieval if previously saved parameters exist for selected month/year
+  useEffect(() => {
+    const existing = existingLogs.find(l => l.month === log.month && l.year === log.year);
+    setLog(prev => {
+      const freshParams = deptParams.reduce((acc, param) => ({ ...acc, [param]: 0 }), {} as Record<string, number>);
+      const mergedParams = existing ? { ...freshParams, ...existing.parameters } : freshParams;
+      
+      const isIdentical = Object.keys(freshParams).every(
+        k => Number(mergedParams[k] || 0) === Number(prev.parameters[k] || 0)
+      );
+      if (isIdentical && prev.month === log.month && prev.year === log.year) {
+        return prev;
+      }
+      
+      return {
+        ...prev,
+        parameters: mergedParams
+      };
+    });
+  }, [log.month, log.year, existingLogs, deptParams]);
 
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const payGrade = PAY_GRADES.find(pg => pg.id === employee.payGradeId)!;
+  const payGrade = PAY_GRADES.find(pg => pg.id === employee.payGradeId) || PAY_GRADES[0];
+  
   const calculation = calculateSalary({
     id: 'temp',
     employeeId: employee.id,
     status: 'Draft',
     ...log
-  }, payGrade);
+  }, payGrade, employee);
 
   return (
     <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
-      <div className="bg-blue-600 p-8 text-white">
-        <div className="flex justify-between items-start">
+      <div className="bg-blue-600 p-8 text-white relative overflow-hidden">
+        <div className="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+        <div className="relative z-10 flex justify-between items-start">
           <div>
-            <h3 className="text-2xl font-bold">{employee.name}</h3>
-            <p className="text-blue-100">{employee.role} | {employee.specialty} Specialist</p>
+            <h3 className="text-2xl font-extrabold tracking-tight">{employee.name}</h3>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="px-2 py-0.5 bg-white/20 rounded text-[10px] font-bold uppercase">{employee.department}</span>
+              <span className="text-blue-100 text-sm font-medium">{employee.role}</span>
+            </div>
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-widest text-blue-200 font-bold">Monthly Rate</p>
-            <p className="text-2xl font-mono font-bold">{formatCurrency(payGrade.baseSalary)}</p>
+            <p className="text-xs uppercase tracking-widest text-blue-200 font-bold">Month Base</p>
+            <p className="text-2xl font-mono font-bold">{formatCurrency(employee.baseSalary || payGrade.baseSalary)}</p>
           </div>
         </div>
       </div>
 
       <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div className="space-y-6">
-          <h4 className="text-sm font-bold uppercase tracking-widest text-gray-400">Work Log Parameters</h4>
-          
-          <div className="space-y-4">
-            <InputItem label="Regular Hours" value={log.regularHours} onChange={(v) => setLog({...log, regularHours: v})} icon={Clock} />
-            <InputItem label="Overtime Hours" value={log.overtimeHours} onChange={(v) => setLog({...log, overtimeHours: v})} icon={TrendingUp} />
-            <InputItem label="Night Shifts" value={log.nightShifts} onChange={(v) => setLog({...log, nightShifts: v})} icon={Clock} />
-            <InputItem label="Holidays Worked" value={log.holidaysWorked} onChange={(v) => setLog({...log, holidaysWorked: v})} icon={Calendar} />
-            <InputItem label="Rest Days Worked" value={log.restDaysWorked} onChange={(v) => setLog({...log, restDaysWorked: v})} icon={Calendar} />
+        <div className="space-y-8">
+          <div>
+            <h4 className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-6 px-1">Dept. Special Parameters (Excel Based)</h4>
+            <div className="space-y-4 max-h-[500px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-200">
+              {deptParams.map((param) => {
+                const config = (DEPARTMENT_PARAMETERS_CONFIG[employee.department] || []).find(p => p.label === param);
+                return (
+                  <InputItem 
+                    key={param} 
+                    label={param} 
+                    value={(log.parameters[param] as number) || 0} 
+                    onChange={(v: number) => setLog({
+                      ...log, 
+                      parameters: { ...log.parameters, [param]: v }
+                    })} 
+                    icon={param.toLowerCase().includes('overtime') ? TrendingUp : param.toLowerCase().includes('headship') ? Briefcase : Clock} 
+                    multiplier={config?.multiplier}
+                    isFlat={config?.isFlat}
+                  />
+                );
+              })}
+            </div>
           </div>
 
           <div className="p-4 bg-gray-50 rounded-2xl space-y-4">
@@ -738,17 +792,14 @@ function PayrollForm({ employee, onCancel, onSave, selectedMonth: initialMonth, 
           
           <div className="space-y-3">
              <CalcRow label="Base Salary" value={calculation.basePay} />
-             <CalcRow label="Overtime Pay" value={calculation.overtimePay} />
-             <CalcRow label="Shift Allowance" value={calculation.nightShiftPay} />
-             <CalcRow label="Holiday/Rest Day Pay" value={calculation.holidayPay + calculation.restDayPay} />
+             <CalcRow label="Parameters Total" value={calculation.parametersTotal} />
              <div className="pt-3 border-t border-white/10" />
              <CalcRow label="Gross Total" value={calculation.totalGross} isBold />
              
-             {/* Breakdown of deductions for real-world clarity */}
              <div className="pt-2 space-y-1">
                <div className="flex justify-between text-[11px] text-gray-500 uppercase font-bold px-1">Deductions Detail</div>
-               <CalcRow label="Employee Pension (7%)" value={-(calculation.basePay * 0.07)} isNegative />
-               <CalcRow label="Income Tax" value={-(calculation.deductions - (calculation.basePay * 0.07))} isNegative />
+               <CalcRow label="Employee Pension (7%)" value={-calculation.pensionContribution} isNegative />
+               <CalcRow label="Income Tax" value={-calculation.incomeTax} isNegative />
              </div>
           </div>
 
@@ -769,7 +820,7 @@ function PayrollForm({ employee, onCancel, onSave, selectedMonth: initialMonth, 
             </button>
             <button 
               onClick={() => {
-                alert(`Payslip generated for ${employee.name}. Status: Approved for Payment.`);
+                alert(`Payroll finalized for ${employee.name}. Monthly records updated.`);
                 onSave(log);
               }}
               className="px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white rounded-xl font-bold flex-1 transition-all"
@@ -783,28 +834,59 @@ function PayrollForm({ employee, onCancel, onSave, selectedMonth: initialMonth, 
   );
 }
 
-function InputItem({ label, value, onChange, icon: Icon }: { label: string, value: number, onChange: (v: number) => void, icon: any }) {
+interface InputItemProps {
+  key?: string | number;
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  icon: any;
+  multiplier?: number;
+  isFlat?: boolean;
+}
+
+function InputItem({ label, value, onChange, icon: Icon, multiplier = 1, isFlat = true }: InputItemProps) {
+  const isNegative = ["deductable", "deduction", "deductions", "penalty"].includes(label.toLowerCase());
+  const sign = isNegative ? -1 : 1;
+  // Calculate subtotal lived row payout
+  const payout = isFlat ? (value * sign) : (value * multiplier * sign);
+
   return (
     <div className="flex items-center gap-4 group">
       <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
         <Icon size={18} />
       </div>
       <div className="flex-1">
-        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-1">{label}</label>
-        <div className="flex items-center gap-3">
-          <input 
-            type="number" 
-            value={value}
-            onChange={(e) => onChange(Number(e.target.value))}
-            className="w-24 bg-white border border-gray-200 p-2 rounded-lg font-mono font-bold outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <div className="flex gap-1">
-            <button onClick={() => onChange(Math.max(0, value - 1))} className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-600">-</button>
-            <button onClick={() => onChange(value + 1)} className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-600">+</button>
-          </div>
-        </div>
-      </div>
-    </div>
+        <div className="flex justify-between items-center mb-1">
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest block">{label}</label>
+          <span className="text-[9px] font-mono font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded uppercase">
+            {isFlat ? 'Flat (1x)' : `Rate: ${multiplier}x`}
+          </span>
+         </div>
+         <div className="flex items-center justify-between gap-3">
+           <div className="flex items-center gap-3">
+             <input 
+               type="number" 
+               value={value === 0 ? '' : value}
+               placeholder="0"
+               onChange={(e) => {
+                 const v = e.target.value === '' ? 0 : Number(e.target.value);
+                 if (!isNaN(v)) {
+                   onChange(v);
+                 }
+               }}
+               className="w-24 bg-white border border-gray-200 p-2 rounded-lg font-mono font-bold outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+             />
+             <div className="flex gap-1">
+               <button onClick={() => onChange(Math.max(0, value - 1))} className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-600">-</button>
+               <button onClick={() => onChange(value + 1)} className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center font-bold text-gray-600">+</button>
+             </div>
+           </div>
+           <span className={`text-xs font-mono font-bold ${isNegative ? 'text-red-500' : 'text-green-600'}`}>
+             {formatCurrency(payout)}
+           </span>
+         </div>
+       </div>
+     </div>
   );
 }
 

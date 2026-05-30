@@ -1,0 +1,1632 @@
+{
+  "Int - Neu": [
+    {
+      "rowIndex": 0,
+      "label": "",
+      "exampleVal": "Dr Nebiyou",
+      "exampleFormula": "",
+      "valCol": 29,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "tew lab pay",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 2,
+      "label": "tew lab credit",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 3,
+      "label": "lideta lab pay",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 4,
+      "label": "lideta lab cretit",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 5,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "AD6*0.02",
+      "valCol": -1,
+      "formulaCol": 30
+    },
+    {
+      "rowIndex": 7,
+      "label": "card pay",
+      "exampleVal": "",
+      "exampleFormula": "AB8*1500*0.6",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 8,
+      "label": "card credit",
+      "exampleVal": "",
+      "exampleFormula": "AB9*800*0.6",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 9,
+      "label": "ultrasound",
+      "exampleVal": "",
+      "exampleFormula": "AB10*100",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 10,
+      "label": "ECG",
+      "exampleVal": "",
+      "exampleFormula": "AB11*60",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 11,
+      "label": "Echo",
+      "exampleVal": "",
+      "exampleFormula": "AB12:AB12*200",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 12,
+      "label": "doppler",
+      "exampleVal": "",
+      "exampleFormula": "AB13:AB13*200",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 13,
+      "label": "xray",
+      "exampleVal": "",
+      "exampleFormula": "AB14*100",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 14,
+      "label": "Spiometry",
+      "exampleVal": "",
+      "exampleFormula": "AD15*100",
+      "valCol": -1,
+      "formulaCol": 30
+    },
+    {
+      "rowIndex": 15,
+      "label": "depo",
+      "exampleVal": "",
+      "exampleFormula": "AB16*600",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 16,
+      "label": "physiotherapy- pay",
+      "exampleVal": "",
+      "exampleFormula": "AB17*70",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 17,
+      "label": "physiotherapy-credit",
+      "exampleVal": "",
+      "exampleFormula": "AB18*50",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 18,
+      "label": "EEG send",
+      "exampleVal": "",
+      "exampleFormula": "AB19*200",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 19,
+      "label": "EEG read",
+      "exampleVal": "",
+      "exampleFormula": "AB20*300",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 20,
+      "label": "NCS one",
+      "exampleVal": "",
+      "exampleFormula": "AB21*500",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 21,
+      "label": "NCS two",
+      "exampleVal": "",
+      "exampleFormula": "AB22*700",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 22,
+      "label": "EMG one",
+      "exampleVal": "",
+      "exampleFormula": "AB23*1200",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 23,
+      "label": "EMG two",
+      "exampleVal": "",
+      "exampleFormula": "AB24*1400",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 24,
+      "label": "signature",
+      "exampleVal": "",
+      "exampleFormula": "AB25*200",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 25,
+      "label": "Evoked Potenial",
+      "exampleVal": "",
+      "exampleFormula": "AD26*300",
+      "valCol": -1,
+      "formulaCol": 30
+    },
+    {
+      "rowIndex": 26,
+      "label": "neuropsychology",
+      "exampleVal": "",
+      "exampleFormula": "H27*2500*0.6",
+      "valCol": -1,
+      "formulaCol": 8
+    },
+    {
+      "rowIndex": 27,
+      "label": "MRI requested",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 28,
+      "label": "Procedure",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 29,
+      "label": "Assistant",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 30,
+      "label": "LP",
+      "exampleVal": "",
+      "exampleFormula": "N31*400",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 31,
+      "label": "overtime",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 32,
+      "label": "Endoscopy",
+      "exampleVal": "",
+      "exampleFormula": "X33*7000*0.5",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 33,
+      "label": "Colonoscopy",
+      "exampleVal": "",
+      "exampleFormula": "X34*10000*0.5",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 34,
+      "label": "biopsy",
+      "exampleVal": "",
+      "exampleFormula": "X35*6000*0.5",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 35,
+      "label": "salary",
+      "exampleVal": "70550.5",
+      "exampleFormula": "",
+      "valCol": 14,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 36,
+      "label": "Headship",
+      "exampleVal": "30000",
+      "exampleFormula": "",
+      "valCol": 14,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 37,
+      "label": "Echo pay",
+      "exampleVal": "",
+      "exampleFormula": "AB38*2500*0.4",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 38,
+      "label": "Echo credit",
+      "exampleVal": "",
+      "exampleFormula": "AB39*700*0.4",
+      "valCol": -1,
+      "formulaCol": 28
+    },
+    {
+      "rowIndex": 39,
+      "label": "0.3",
+      "exampleVal": "35017.5",
+      "exampleFormula": "",
+      "valCol": 14,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 40,
+      "label": "others (last month)",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 41,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "SUM(AE6:AE25)",
+      "valCol": -1,
+      "formulaCol": 30
+    }
+  ],
+  "Surgery": [
+    {
+      "rowIndex": 0,
+      "label": "",
+      "exampleVal": "Dr Mekdim",
+      "exampleFormula": "",
+      "valCol": 39,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "tew lab pay",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 2,
+      "label": "tew lab credit",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 3,
+      "label": "lideta lab pay",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 4,
+      "label": "lideta lab cretit",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 5,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "AN6*0.02",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 7,
+      "label": "card pay",
+      "exampleVal": "",
+      "exampleFormula": "AN8*1500*0.6",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 8,
+      "label": "card credit",
+      "exampleVal": "",
+      "exampleFormula": "AN9*800*0.6",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 9,
+      "label": "ultrasound",
+      "exampleVal": "",
+      "exampleFormula": "AN10*100",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 10,
+      "label": "Echo",
+      "exampleVal": "",
+      "exampleFormula": "AN11:AN11*200",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 11,
+      "label": "doppler",
+      "exampleVal": "",
+      "exampleFormula": "AN12:AN12*200",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 12,
+      "label": "ECG",
+      "exampleVal": "",
+      "exampleFormula": "AN13*60",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 13,
+      "label": "xray",
+      "exampleVal": "",
+      "exampleFormula": "AN14*100",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 14,
+      "label": "depo",
+      "exampleVal": "",
+      "exampleFormula": "AN15*600",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 15,
+      "label": "physiotherapy- pay",
+      "exampleVal": "",
+      "exampleFormula": "AN16*70",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 16,
+      "label": "physiotherapy-credit",
+      "exampleVal": "",
+      "exampleFormula": "AN17*50",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 17,
+      "label": "EEG send",
+      "exampleVal": "",
+      "exampleFormula": "AN18*200",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 18,
+      "label": "EEG read",
+      "exampleVal": "",
+      "exampleFormula": "AN19*300",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 19,
+      "label": "MRI requested",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 20,
+      "label": "Evoked Potenial",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 21,
+      "label": "neuropsychology",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 22,
+      "label": "Spiometry",
+      "exampleVal": "",
+      "exampleFormula": "AN23*100",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 23,
+      "label": "Procedure",
+      "exampleVal": "",
+      "exampleFormula": "AN24*0.8",
+      "valCol": -1,
+      "formulaCol": 40
+    },
+    {
+      "rowIndex": 24,
+      "label": "Assistant",
+      "exampleVal": "",
+      "exampleFormula": "B25*2000",
+      "valCol": -1,
+      "formulaCol": 2
+    },
+    {
+      "rowIndex": 25,
+      "label": "consult ansthsa",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 26,
+      "label": "headship",
+      "exampleVal": "20000",
+      "exampleFormula": "",
+      "valCol": 2,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 27,
+      "label": "Salary",
+      "exampleVal": "70550",
+      "exampleFormula": "",
+      "valCol": 2,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 29,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "SUM(AO6:AO29)",
+      "valCol": -1,
+      "formulaCol": 40
+    }
+  ],
+  "ped neuro": [
+    {
+      "rowIndex": 0,
+      "label": "",
+      "exampleVal": "Dr Ayalew ",
+      "exampleFormula": "",
+      "valCol": 9,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "tew lab pay",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 2,
+      "label": "tew lab credit",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 3,
+      "label": "lideta lab pay",
+      "exampleVal": "42860",
+      "exampleFormula": "",
+      "valCol": 1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 4,
+      "label": "lideta lab cretit",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 5,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "J6*0.02",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 7,
+      "label": "card pay",
+      "exampleVal": "170",
+      "exampleFormula": "J8*1500*0.6",
+      "valCol": 1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 8,
+      "label": "card credit",
+      "exampleVal": "",
+      "exampleFormula": "J9*800*0.6",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 9,
+      "label": "ultrasound",
+      "exampleVal": "",
+      "exampleFormula": "J10*100",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 10,
+      "label": "Echo",
+      "exampleVal": "",
+      "exampleFormula": "J11:J11*200",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 11,
+      "label": "doppler",
+      "exampleVal": "",
+      "exampleFormula": "J12:J12*200",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 12,
+      "label": "ECG",
+      "exampleVal": "",
+      "exampleFormula": "J13*60",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 13,
+      "label": "xray",
+      "exampleVal": "",
+      "exampleFormula": "J14*1000*0.1",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 14,
+      "label": "depo",
+      "exampleVal": "",
+      "exampleFormula": "J15*600",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 15,
+      "label": "physiotherapy- pay",
+      "exampleVal": "",
+      "exampleFormula": "J16*70",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 16,
+      "label": "physiotherapy-credit",
+      "exampleVal": "",
+      "exampleFormula": "J17*50",
+      "valCol": -1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 17,
+      "label": "EEG send",
+      "exampleVal": "40",
+      "exampleFormula": "J18*200",
+      "valCol": 1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 18,
+      "label": "EEG read",
+      "exampleVal": "2",
+      "exampleFormula": "J19*300",
+      "valCol": 1,
+      "formulaCol": 10
+    },
+    {
+      "rowIndex": 19,
+      "label": "MRI requested",
+      "exampleVal": "2200",
+      "exampleFormula": "",
+      "valCol": 2,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 23,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "SUM(K6:K23)",
+      "valCol": -1,
+      "formulaCol": 10
+    }
+  ],
+  "Radiology": [
+    {
+      "rowIndex": 0,
+      "label": "",
+      "exampleVal": "Prof Daniel",
+      "exampleFormula": "",
+      "valCol": 13,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "MRI total",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 3,
+      "label": "ultrasound pay",
+      "exampleVal": "",
+      "exampleFormula": "N4*700*0.4",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 4,
+      "label": "ultrasound credit",
+      "exampleVal": "",
+      "exampleFormula": "N5*500*0.4",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 6,
+      "label": "Doppler pay",
+      "exampleVal": "",
+      "exampleFormula": "N7*1500*0.4",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 7,
+      "label": "Doppler Credit",
+      "exampleVal": "",
+      "exampleFormula": "N8*700*0.4",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 9,
+      "label": "Xray pay",
+      "exampleVal": "",
+      "exampleFormula": "N10*20",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 10,
+      "label": "Xray credit",
+      "exampleVal": "",
+      "exampleFormula": "N11*20",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 12,
+      "label": "ECHO pay",
+      "exampleVal": "",
+      "exampleFormula": "N13*20",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 13,
+      "label": "ECHO credit",
+      "exampleVal": "",
+      "exampleFormula": "N14*20",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 15,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "SUM(O2:O15)",
+      "valCol": -1,
+      "formulaCol": 14
+    }
+  ],
+  "GP": [
+    {
+      "rowIndex": 0,
+      "label": "",
+      "exampleVal": "Dr Amanuel",
+      "exampleFormula": "",
+      "valCol": 13,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "NCS one",
+      "exampleVal": "",
+      "exampleFormula": "N2*250",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 2,
+      "label": "NCS two",
+      "exampleVal": "",
+      "exampleFormula": "N3*350",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 3,
+      "label": "EMG one",
+      "exampleVal": "",
+      "exampleFormula": "N4*250",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 4,
+      "label": "EMG two",
+      "exampleVal": "",
+      "exampleFormula": "N5*350",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 5,
+      "label": "signature",
+      "exampleVal": "",
+      "exampleFormula": "N6*200",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 6,
+      "label": "Evoked Potenial",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 7,
+      "label": "neuropsychology",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 8,
+      "label": "Spiometry",
+      "exampleVal": "",
+      "exampleFormula": "N9*100",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 9,
+      "label": "Procedure",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 10,
+      "label": "Assistant",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 11,
+      "label": "card",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 12,
+      "label": "LP",
+      "exampleVal": "",
+      "exampleFormula": "N13*200",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 13,
+      "label": "Salary basic",
+      "exampleVal": "18500",
+      "exampleFormula": "",
+      "valCol": 11,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 14,
+      "label": "Salary Net",
+      "exampleVal": "14175",
+      "exampleFormula": "",
+      "valCol": 12,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 19,
+      "label": "",
+      "exampleVal": "",
+      "exampleFormula": "SUM(O2:O19)",
+      "valCol": -1,
+      "formulaCol": 14
+    }
+  ],
+  "Nurses": [
+    {
+      "rowIndex": 0,
+      "label": "",
+      "exampleVal": "Sr. Mastewal ",
+      "exampleFormula": "",
+      "valCol": 63,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "Vital sign",
+      "exampleVal": "",
+      "exampleFormula": "BL2*10",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 2,
+      "label": "EKG",
+      "exampleVal": "",
+      "exampleFormula": "BL3*60",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 3,
+      "label": "U/S Echo/ doppler",
+      "exampleVal": "",
+      "exampleFormula": "BL4*40",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 4,
+      "label": "Spirometry",
+      "exampleVal": "",
+      "exampleFormula": "BL5*100",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 5,
+      "label": "Endoscopy",
+      "exampleVal": "",
+      "exampleFormula": "BL6*500",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 6,
+      "label": "LP",
+      "exampleVal": "",
+      "exampleFormula": "BL7*200",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 7,
+      "label": "Xray",
+      "exampleVal": "",
+      "exampleFormula": "BL8*70",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 8,
+      "label": "EEG",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 9,
+      "label": "MRI",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 10,
+      "label": "Night Duty",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 11,
+      "label": "overtime",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 12,
+      "label": "Headship",
+      "exampleVal": "1000",
+      "exampleFormula": "",
+      "valCol": 4,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 13,
+      "label": "OR",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 14,
+      "label": "Salary net",
+      "exampleVal": "8580",
+      "exampleFormula": "",
+      "valCol": 4,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 15,
+      "label": "Salary Gross",
+      "exampleVal": "11000",
+      "exampleFormula": "",
+      "valCol": 3,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 16,
+      "label": "0.3",
+      "exampleVal": "",
+      "exampleFormula": "D16*0.3",
+      "valCol": -1,
+      "formulaCol": 4
+    },
+    {
+      "rowIndex": 17,
+      "label": "evoked",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 18,
+      "label": "c-arm",
+      "exampleVal": "",
+      "exampleFormula": "AX19*100",
+      "valCol": -1,
+      "formulaCol": 50
+    },
+    {
+      "rowIndex": 19,
+      "label": "x-ray",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 20,
+      "label": "Total",
+      "exampleVal": "",
+      "exampleFormula": "SUM(BM2:BM20)",
+      "valCol": -1,
+      "formulaCol": 64
+    },
+    {
+      "rowIndex": 21,
+      "label": "",
+      "exampleVal": "364",
+      "exampleFormula": "",
+      "valCol": 34,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 22,
+      "label": "deductable",
+      "exampleVal": "",
+      "exampleFormula": "AI21-AI22",
+      "valCol": -1,
+      "formulaCol": 34
+    }
+  ],
+  "OR ICU": [
+    {
+      "rowIndex": 0,
+      "label": "OR",
+      "exampleVal": "Biniyam Taye",
+      "exampleFormula": "",
+      "valCol": 23,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "Vital sign",
+      "exampleVal": "",
+      "exampleFormula": "X2*10",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 2,
+      "label": "EKG",
+      "exampleVal": "",
+      "exampleFormula": "X3*60",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 3,
+      "label": "U/S Echo/ doppler",
+      "exampleVal": "",
+      "exampleFormula": "X4*40",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 4,
+      "label": "Spirometry",
+      "exampleVal": "",
+      "exampleFormula": "X5*100",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 5,
+      "label": "EEG",
+      "exampleVal": "",
+      "exampleFormula": "X6*10",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 6,
+      "label": "MRI",
+      "exampleVal": "",
+      "exampleFormula": "X7*10",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 7,
+      "label": "Night Duty",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 8,
+      "label": "overtime",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 9,
+      "label": "Headship",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 10,
+      "label": "Salary Gross",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 11,
+      "label": "Salary net",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 12,
+      "label": "OR",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 13,
+      "label": "Xray",
+      "exampleVal": "",
+      "exampleFormula": "X14*10",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 14,
+      "label": "ICU",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 15,
+      "label": "MRI sedation",
+      "exampleVal": "",
+      "exampleFormula": "R16*100",
+      "valCol": -1,
+      "formulaCol": 18
+    },
+    {
+      "rowIndex": 16,
+      "label": "0.3",
+      "exampleVal": "",
+      "exampleFormula": "N11*0.3",
+      "valCol": -1,
+      "formulaCol": 14
+    },
+    {
+      "rowIndex": 17,
+      "label": "other ( last month)",
+      "exampleVal": "3000",
+      "exampleFormula": "",
+      "valCol": 22,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 18,
+      "label": "Total",
+      "exampleVal": "",
+      "exampleFormula": "SUM(Y2:Y18)",
+      "valCol": -1,
+      "formulaCol": 24
+    },
+    {
+      "rowIndex": 23,
+      "label": "",
+      "exampleVal": "duty nxt",
+      "exampleFormula": "",
+      "valCol": 6,
+      "formulaCol": -1
+    }
+  ],
+  "Labs": [
+    {
+      "rowIndex": 0,
+      "label": "OR",
+      "exampleVal": "Shewadeg gebru",
+      "exampleFormula": "",
+      "valCol": 17,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "Night Duty",
+      "exampleVal": "",
+      "exampleFormula": "R2*600",
+      "valCol": -1,
+      "formulaCol": 18
+    },
+    {
+      "rowIndex": 2,
+      "label": "Evening Duty",
+      "exampleVal": "",
+      "exampleFormula": "R3*400",
+      "valCol": -1,
+      "formulaCol": 18
+    },
+    {
+      "rowIndex": 3,
+      "label": "Sunday",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 4,
+      "label": "Holiday",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 5,
+      "label": "topup",
+      "exampleVal": "0.2",
+      "exampleFormula": "R8*0.2",
+      "valCol": 17,
+      "formulaCol": 18
+    },
+    {
+      "rowIndex": 6,
+      "label": "salary net",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 7,
+      "label": "Salary Basic",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 8,
+      "label": "Headship",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 10,
+      "label": "Total",
+      "exampleVal": "",
+      "exampleFormula": "SUM(S2:S10)",
+      "valCol": -1,
+      "formulaCol": 18
+    }
+  ],
+  "Others": [
+    {
+      "rowIndex": 0,
+      "label": "OR",
+      "exampleVal": "Nega Tesema",
+      "exampleFormula": "",
+      "valCol": 51,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "Night Duty",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 2,
+      "label": "overtime",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 3,
+      "label": "0.3",
+      "exampleVal": "",
+      "exampleFormula": "AR10*0.3",
+      "valCol": -1,
+      "formulaCol": 44
+    },
+    {
+      "rowIndex": 4,
+      "label": "Sunday /holiday",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 5,
+      "label": "Headship",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 6,
+      "label": "topup",
+      "exampleVal": "5000",
+      "exampleFormula": "",
+      "valCol": 18,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 8,
+      "label": "others",
+      "exampleVal": "700",
+      "exampleFormula": "",
+      "valCol": 24,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 9,
+      "label": "Basic Salary",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 10,
+      "label": "Salary net",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 11,
+      "label": "Total",
+      "exampleVal": "",
+      "exampleFormula": "SUM(BA2:BA11)",
+      "valCol": -1,
+      "formulaCol": 52
+    },
+    {
+      "rowIndex": 13,
+      "label": "Salary basic",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    }
+  ],
+  "Physiotherapy": [
+    {
+      "rowIndex": 0,
+      "label": "OR",
+      "exampleVal": "Hanna worknh",
+      "exampleFormula": "",
+      "valCol": 5,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "Night Duty",
+      "exampleVal": "",
+      "exampleFormula": "H2*600",
+      "valCol": -1,
+      "formulaCol": 8
+    },
+    {
+      "rowIndex": 2,
+      "label": "Evening Duty",
+      "exampleVal": "",
+      "exampleFormula": "H3*400",
+      "valCol": -1,
+      "formulaCol": 8
+    },
+    {
+      "rowIndex": 3,
+      "label": "Sunday",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 4,
+      "label": "Holiday",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 5,
+      "label": "topup",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 6,
+      "label": "Headship",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 7,
+      "label": "salary net",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 8,
+      "label": "Salary basic",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 9,
+      "label": "Total",
+      "exampleVal": "",
+      "exampleFormula": "SUM(I2:I9)",
+      "valCol": -1,
+      "formulaCol": 8
+    }
+  ],
+  "Construction": [
+    {
+      "rowIndex": 0,
+      "label": "OR",
+      "exampleVal": "Fikru a",
+      "exampleFormula": "",
+      "valCol": 5,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 1,
+      "label": "Night Duty",
+      "exampleVal": "",
+      "exampleFormula": "H2*600",
+      "valCol": -1,
+      "formulaCol": 8
+    },
+    {
+      "rowIndex": 2,
+      "label": "Evening Duty",
+      "exampleVal": "",
+      "exampleFormula": "H3*400",
+      "valCol": -1,
+      "formulaCol": 8
+    },
+    {
+      "rowIndex": 3,
+      "label": "Sunday",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 4,
+      "label": "Holiday",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 5,
+      "label": "topup",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 6,
+      "label": "Headship",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 7,
+      "label": "salary net",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 8,
+      "label": "Salary basic",
+      "exampleVal": "",
+      "exampleFormula": "",
+      "valCol": -1,
+      "formulaCol": -1
+    },
+    {
+      "rowIndex": 9,
+      "label": "Total",
+      "exampleVal": "",
+      "exampleFormula": "SUM(I2:I9)",
+      "valCol": -1,
+      "formulaCol": 8
+    }
+  ]
+}

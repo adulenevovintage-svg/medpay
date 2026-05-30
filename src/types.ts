@@ -1,14 +1,20 @@
 
-export type EmployeeRole = 'Doctor' | 'Nurse' | 'Laboratorist' | 'Clerk' | 'Cleaner' | 'Admin';
+export type EmployeeRole = 'Doctor' | 'Nurse' | 'Laboratorist' | 'Technician' | 'Clerk' | 'Cleaner' | 'Admin' | 'Security' | 'Maintenance' | 'Other';
 
 export type Specialty = 
-  | 'Cardiac' 
   | 'Neurology' 
-  | 'Thoracic' 
-  | 'Radiology' 
-  | 'Emergency' 
-  | 'General' 
+  | 'Surgery' 
   | 'Pediatrics' 
+  | 'Radiology' 
+  | 'General' 
+  | 'Nursing'
+  | 'Laboratory'
+  | 'Physiotherapy'
+  | 'Dental'
+  | 'Anesthesia'
+  | 'Health Officer'
+  | 'Radiographer'
+  | 'Other'
   | 'None';
 
 export interface PayGrade {
@@ -32,6 +38,8 @@ export interface Employee {
   department: string;
   payGradeId: string;
   joinDate: string;
+  baseSalary?: number; // Override pay grade base if needed
+  headshipAllowance?: number;
 }
 
 export interface MonthlyWorkLog {
@@ -39,21 +47,16 @@ export interface MonthlyWorkLog {
   employeeId: string;
   month: number; // 0-11
   year: number;
-  regularHours: number;
-  overtimeHours: number;
-  nightShifts: number;
-  holidaysWorked: number;
-  restDaysWorked: number;
+  parameters: Record<string, number>;
   status: 'Draft' | 'Approved' | 'Paid';
 }
 
 export interface SalaryCalculation {
   basePay: number;
-  overtimePay: number;
-  nightShiftPay: number;
-  holidayPay: number;
-  restDayPay: number;
+  parametersTotal: number;
   totalGross: number;
   deductions: number;
+  pensionContribution: number;
+  incomeTax: number;
   totalNet: number;
 }
