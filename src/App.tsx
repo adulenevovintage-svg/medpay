@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Users, 
   LayoutDashboard, 
@@ -22,7 +22,11 @@ import {
   Clock,
   Calendar,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Lock,
+  Unlock,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Employee, EmployeeRole, MonthlyWorkLog, SalaryCalculation } from './types';
@@ -32,6 +36,70 @@ import { calculateSalary, formatCurrency } from './services/payrollService';
 type View = 'dashboard' | 'employees' | 'payroll' | 'reports';
 
 export default function App() {
+  const [isLocked, setIsLocked] = useState(true);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
+
+  // Inactivity tracking (10 minutes of inactivity locks the system)
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        setIsLocked(true);
+      }, 10 * 60 * 1000); // 10 minutes (600,000 ms)
+    };
+
+    const handleUserInteraction = () => {
+      if (!isLocked) {
+        resetTimer();
+      }
+    };
+
+    // Listen to standard mouse, keyboard, and scroll gestures
+    const interactionEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+
+    if (!isLocked) {
+      resetTimer();
+      interactionEvents.forEach(event => {
+        window.addEventListener(event, handleUserInteraction);
+      });
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      interactionEvents.forEach(event => {
+        window.removeEventListener(event, handleUserInteraction);
+      });
+    };
+  }, [isLocked]);
+
+  // Handle immediate keyboard focus on password input when locked
+  useEffect(() => {
+    if (isLocked) {
+      const t = setTimeout(() => {
+        passwordInputRef.current?.focus();
+      }, 150);
+      return () => clearTimeout(t);
+    }
+  }, [isLocked]);
+
+  const handleUnlockSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (passwordInput === 'yehulu@lideta') {
+      setIsLocked(false);
+      setPasswordError(false);
+      setPasswordInput('');
+    } else {
+      setPasswordError(true);
+      setPasswordInput('');
+      passwordInputRef.current?.focus();
+    }
+  };
+
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [employees] = useState<Employee[]>(() => {
     const saved = localStorage.getItem('medpay_employees_v3');
@@ -111,7 +179,81 @@ export default function App() {
   const selectedEmployee = employees.find(e => e.id === selectedEmployeeId);
 
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-sans text-gray-900 overflow-hidden">
+    <div className="flex h-screen bg-[#F8FAFC] font-sans text-gray-900 overflow-hidden relative">
+      <AnimatePresence>
+        {isLocked && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-slate-950 flex flex-col items-center justify-center p-6 select-none"
+          >
+            {/* Ambient neural / glowing gradient backdrop */}
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.08)_0%,transparent_70%)]" />
+            <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.05)_0%,transparent_50%)]" />
+
+            <motion.div 
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 max-w-md w-full shadow-2xl shadow-black/80 flex flex-col items-center"
+            >
+              <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/30">
+                <Lock size={28} className="animate-pulse" />
+              </div>
+
+              <span className="text-[10px] font-bold text-emerald-500 font-mono tracking-[0.3em] uppercase mb-2">SECURED TERMINAL</span>
+              <h2 className="text-2xl font-black text-white tracking-tight text-center leading-tight font-sans">Yehulushet Neurological Clinic</h2>
+              <p className="text-slate-400 text-xs font-semibold text-center mt-1.5 uppercase tracking-wider">Medical Records & Payroll</p>
+
+              <form onSubmit={handleUnlockSubmit} className="w-full mt-8 space-y-4">
+                <div className="relative">
+                  <input
+                    ref={passwordInputRef}
+                    type={showPassword ? "text" : "password"}
+                    value={passwordInput}
+                    onChange={(e) => {
+                      setPasswordInput(e.target.value);
+                      if (passwordError) setPasswordError(false);
+                    }}
+                    placeholder="Security Password"
+                    className="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 focus:border-blue-500/80 focus:ring-4 focus:ring-blue-500/10 rounded-2xl px-5 py-4 text-center text-white font-mono placeholder-slate-600 focus:outline-none transition-all text-xl tracking-[0.15em] font-extrabold"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+
+                {passwordError && (
+                  <motion.div 
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold py-3 px-4 rounded-xl flex items-center gap-2 justify-center"
+                  >
+                    <AlertCircle size={14} className="shrink-0" />
+                    <span>Incorrect password. Please try again.</span>
+                  </motion.div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white font-bold text-sm py-4 rounded-2xl hover:bg-blue-500 active:bg-blue-700 transition-all shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 mt-2 cursor-pointer h-12"
+                >
+                  <Unlock size={16} /> Unlock Directory
+                </button>
+              </form>
+
+              <p className="text-[9px] font-mono leading-relaxed text-slate-500 text-center mt-8 uppercase tracking-widest max-w-[280px]">
+                Highly Confidential. Unauthorized entry is strictly logged and audited.
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col gap-8">
         <div className="flex items-center gap-3 px-2">
