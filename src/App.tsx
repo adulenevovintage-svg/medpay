@@ -26,12 +26,38 @@ import {
   Lock,
   Unlock,
   Eye,
-  EyeOff
+  EyeOff,
+  Brain,
+  Activity,
+  Baby,
+  Scan,
+  HeartPulse,
+  FlaskConical,
+  HardHat,
+  Coins,
+  Wrench,
+  ChevronLeft,
+  Building
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Employee, EmployeeRole, MonthlyWorkLog, SalaryCalculation } from './types';
+import { Employee, EmployeeRole, Specialty, MonthlyWorkLog, SalaryCalculation } from './types';
 import { generateMockEmployees, PAY_GRADES, DEPARTMENTS, DEPARTMENT_PARAMETERS, DEPARTMENT_PARAMETERS_CONFIG } from './constants';
 import { calculateSalary, formatCurrency } from './services/payrollService';
+
+const DEPARTMENT_METADATA: Record<string, { icon: any, colorClass: string, gradientClass: string }> = {
+  'Internal Neurology': { icon: Brain, colorClass: 'text-indigo-600 bg-indigo-50 border-indigo-100', gradientClass: 'from-indigo-500/5 to-indigo-500/0' },
+  'Surgery': { icon: Activity, colorClass: 'text-rose-600 bg-rose-50 border-rose-100', gradientClass: 'from-rose-500/5 to-rose-500/0' },
+  'Pediatrics Neurology': { icon: Baby, colorClass: 'text-amber-600 bg-amber-50 border-amber-100', gradientClass: 'from-amber-500/5 to-amber-500/0' },
+  'Radiology': { icon: Scan, colorClass: 'text-purple-600 bg-purple-50 border-purple-100', gradientClass: 'from-purple-500/5 to-purple-500/0' },
+  'General Practice': { icon: Stethoscope, colorClass: 'text-emerald-600 bg-emerald-50 border-emerald-100', gradientClass: 'from-emerald-500/5 to-emerald-500/0' },
+  'Nursing': { icon: HeartPulse, colorClass: 'text-pink-600 bg-pink-50 border-pink-100', gradientClass: 'from-pink-500/5 to-pink-500/0' },
+  'OR & ICU': { icon: Activity, colorClass: 'text-cyan-600 bg-cyan-50 border-cyan-100', gradientClass: 'from-cyan-500/5 to-cyan-500/0' },
+  'Laboratory': { icon: FlaskConical, colorClass: 'text-sky-600 bg-sky-50 border-sky-100', gradientClass: 'from-sky-500/5 to-sky-500/0' },
+  'Physiotherapy': { icon: Activity, colorClass: 'text-lime-700 bg-lime-50 border-lime-100', gradientClass: 'from-lime-500/5 to-lime-500/0' },
+  'Construction': { icon: HardHat, colorClass: 'text-orange-600 bg-orange-50 border-orange-100', gradientClass: 'from-orange-500/5 to-orange-500/0' },
+  'Administrative & Finance': { icon: Coins, colorClass: 'text-slate-700 bg-slate-50 border-slate-100', gradientClass: 'from-slate-500/5 to-slate-500/0' },
+  'Maintenance & Support': { icon: Wrench, colorClass: 'text-zinc-600 bg-zinc-50 border-zinc-100', gradientClass: 'from-zinc-500/5 to-zinc-500/0' }
+};
 
 type View = 'dashboard' | 'employees' | 'payroll' | 'reports';
 
@@ -101,23 +127,76 @@ export default function App() {
   };
 
   const [currentView, setCurrentView] = useState<View>('dashboard');
-  const [employees] = useState<Employee[]>(() => {
+  const [selectedDept, setSelectedDept] = useState<string | null>(null);
+  const [employees, setEmployees] = useState<Employee[]>(() => {
     const saved = localStorage.getItem('medpay_employees_v3');
     if (saved) return JSON.parse(saved);
     const generated = generateMockEmployees(300);
     localStorage.setItem('medpay_employees_v3', JSON.stringify(generated));
     return generated;
   });
+
+  useEffect(() => {
+    localStorage.setItem('medpay_employees_v3', JSON.stringify(employees));
+  }, [employees]);
+
+  // Adding employee form states
+  const [isAddingEmployee, setIsAddingEmployee] = useState(false);
+  const [newEmpName, setNewEmpName] = useState('');
+  const [newEmpDept, setNewEmpDept] = useState('');
+  const [newEmpRole, setNewEmpRole] = useState<EmployeeRole>('Doctor');
+  const [newEmpSpecialty, setNewEmpSpecialty] = useState<Specialty>('General');
+  const [newEmpSalary, setNewEmpSalary] = useState('');
+  const [newEmpDate, setNewEmpDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const handleOpenAddEmployee = () => {
+    setNewEmpName('');
+    setNewEmpDept(selectedDept || DEPARTMENTS[0]);
+    setNewEmpRole('Doctor');
+    setNewEmpSpecialty('General');
+    setNewEmpSalary('');
+    setNewEmpDate(new Date().toISOString().split('T')[0]);
+    setIsAddingEmployee(true);
+  };
+
+  const handleAddEmployeeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newEmpName.trim()) return;
+
+    const payClass = PAY_GRADES.find(pg => pg.role === newEmpRole && pg.specialty === newEmpSpecialty) || 
+                     PAY_GRADES.find(pg => pg.role === newEmpRole) || 
+                     PAY_GRADES[0];
+
+    const highestIdNum = employees.reduce((max, emp) => {
+      const num = parseInt(emp.id.replace('EMP-', ''), 10);
+      return isNaN(num) ? max : Math.max(max, num);
+    }, 1000);
+
+    const newEmp: Employee = {
+      id: `EMP-${highestIdNum + 1}`,
+      name: newEmpName.trim(),
+      role: newEmpRole,
+      specialty: newEmpSpecialty,
+      department: newEmpDept,
+      payGradeId: payClass.id,
+      joinDate: newEmpDate,
+      baseSalary: newEmpSalary ? Number(newEmpSalary) : undefined
+    };
+
+    setEmployees(prev => [newEmp, ...prev]);
+    setIsAddingEmployee(false);
+  };
+
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [viewingEmployeeId, setViewingEmployeeId] = useState<string | null>(null);
   
-  // Reset page when search changes
+  // Reset page when search or department changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, selectedDept]);
   
   // Mock monthly logs store with persistence
   const [monthlyLogs, setMonthlyLogs] = useState<Record<string, MonthlyWorkLog[]>>(() => {
@@ -143,12 +222,15 @@ export default function App() {
   };
 
   const filteredEmployees = useMemo(() => {
-    return employees.filter(emp => 
-      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.role.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [employees, searchTerm]);
+    return employees.filter(emp => {
+      const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        emp.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        emp.role.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesDept = selectedDept ? emp.department === selectedDept : true;
+      return matchesSearch && matchesDept;
+    });
+  }, [employees, searchTerm, selectedDept]);
 
   const stats = useMemo(() => {
     const paidByMonthCount = employees.filter(e => isEmployeePaidInPeriod(e.id, selectedMonth, selectedYear)).length;
@@ -164,7 +246,12 @@ export default function App() {
 
   const SidebarItem = ({ id, icon: Icon, label }: { id: View, icon: any, label: string }) => (
     <button
-      onClick={() => setCurrentView(id)}
+      onClick={() => {
+        setCurrentView(id);
+        if (id === 'employees') {
+          setSelectedDept(null);
+        }
+      }}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
         currentView === id 
         ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' 
@@ -181,6 +268,152 @@ export default function App() {
   return (
     <div className="flex h-screen bg-[#F8FAFC] font-sans text-gray-900 overflow-hidden relative">
       <AnimatePresence>
+        {isAddingEmployee && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[1000] bg-slate-950/60 backdrop-blur-sm flex flex-col items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              className="bg-white border border-gray-100 rounded-3xl p-8 max-w-lg w-full shadow-2xl flex flex-col items-stretch overflow-hidden relative"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">Register Specialty Staff</h3>
+                  <p className="text-xs text-gray-500 font-medium">Assign credentials, division boundary, and scales.</p>
+                </div>
+                <button 
+                  onClick={() => setIsAddingEmployee(false)}
+                  className="w-10 h-10 rounded-full border border-gray-100 hover:bg-gray-100/50 flex flex-col items-center justify-center font-bold text-gray-400 select-none cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleAddEmployeeSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Staff Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={newEmpName}
+                    onChange={(e) => setNewEmpName(e.target.value)}
+                    placeholder="e.g. Dr. Hanna Yosef"
+                    className="w-full bg-gray-50 border border-gray-100 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl px-4 py-3 text-gray-850 font-semibold focus:outline-none transition-all placeholder-gray-400"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Department Division</label>
+                    <select
+                      value={newEmpDept}
+                      onChange={(e) => setNewEmpDept(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-100 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl px-4 py-3 text-gray-700 font-semibold focus:outline-none transition-all"
+                    >
+                      {DEPARTMENTS.map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Staff Service Role</label>
+                    <select
+                      value={newEmpRole}
+                      onChange={(e) => setNewEmpRole(e.target.value as EmployeeRole)}
+                      className="w-full bg-gray-50 border border-gray-100 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl px-4 py-3 text-gray-700 font-semibold focus:outline-none transition-all"
+                    >
+                      <option value="Doctor">Doctor</option>
+                      <option value="Nurse">Nurse</option>
+                      <option value="Laboratorist">Laboratorist</option>
+                      <option value="Technician">Technician</option>
+                      <option value="Clerk">Clerk</option>
+                      <option value="Cleaner">Cleaner</option>
+                      <option value="Admin">Admin</option>
+                      <option value="Security">Security</option>
+                      <option value="Maintenance">Maintenance</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Specialty Focus</label>
+                    <select
+                      value={newEmpSpecialty}
+                      onChange={(e) => setNewEmpSpecialty(e.target.value as Specialty)}
+                      className="w-full bg-gray-50 border border-gray-100 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl px-4 py-3 text-gray-700 font-semibold focus:outline-none transition-all"
+                    >
+                      <option value="General">General</option>
+                      <option value="Neurology">Neurology</option>
+                      <option value="Surgery">Surgery</option>
+                      <option value="Pediatrics">Pediatrics</option>
+                      <option value="Radiology">Radiology</option>
+                      <option value="Nursing">Nursing</option>
+                      <option value="Laboratory">Laboratory</option>
+                      <option value="Physiotherapy">Physiotherapy</option>
+                      <option value="Dental">Dental</option>
+                      <option value="Anesthesia">Anesthesia</option>
+                      <option value="Health Officer">Health Officer</option>
+                      <option value="Radiographer">Radiographer</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Hired Date</label>
+                    <input
+                      type="date"
+                      required
+                      value={newEmpDate}
+                      onChange={(e) => setNewEmpDate(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-100 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl px-4 py-3 text-gray-700 font-semibold focus:outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Base Salary Override (Optional)</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">ETB</span>
+                    <input
+                      type="number"
+                      value={newEmpSalary}
+                      onChange={(e) => setNewEmpSalary(e.target.value)}
+                      placeholder="Leave blank for division grade default scale"
+                      className="w-full bg-gray-50 border border-gray-100 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100 rounded-2xl pl-12 pr-4 py-3 text-gray-805 font-mono focus:outline-none transition-all placeholder-gray-400 placeholder:italic"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 italic mt-1.5 leading-relaxed">
+                    Leave empty to automatically match the appropriate payroll grade default scale based on selected role & specialty.
+                  </p>
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-gray-50 mt-6">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingEmployee(false)}
+                    className="flex-1 border border-gray-200 text-gray-700 font-bold text-sm py-3.5 rounded-2xl hover:bg-gray-50 transition-all cursor-pointer text-center"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white font-bold text-sm py-3.5 rounded-2xl hover:bg-blue-500 active:bg-blue-700 transition-all shadow-lg hover:shadow-blue-500/10 flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Plus size={16} /> Save Record
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
         {isLocked && (
           <motion.div 
             initial={{ opacity: 0 }}
@@ -369,125 +602,325 @@ export default function App() {
             {currentView === 'employees' && (
               <motion.div
                 key="employees"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+                exit={{ opacity: 0, y: -15 }}
+                className="space-y-6"
               >
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50">
-                      <Filter size={16} /> Filters
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50">
-                      <Download size={16} /> Export CSV
-                    </button>
-                  </div>
-                  <button className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold shadow-md shadow-blue-100 hover:bg-blue-700 transition-all">
-                    <Plus size={18} /> New Employee
-                  </button>
-                </div>
+                <AnimatePresence mode="wait">
+                  {!selectedDept && !searchTerm ? (
+                    <motion.div
+                      key="dept-grid"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-6"
+                    >
+                    {/* Header Summary Cards for Departments directory */}
+                    <div className="bg-gradient-to-r from-blue-900 to-indigo-950 rounded-3xl p-8 text-white relative overflow-hidden shadow-xl shadow-blue-950/20">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.15)_0%,transparent_50%)]" />
+                      <div className="relative z-10 max-w-2xl">
+                        <span className="text-[10px] font-bold text-blue-400 font-mono tracking-[0.3em] uppercase mb-2 block">Yehulushet Speciality Clinic</span>
+                        <h3 className="text-3xl font-black tracking-tight mb-2">Clinical Departments & Staff Directory</h3>
+                        <p className="text-blue-100/80 text-sm leading-relaxed font-medium">
+                          Select a department division down below to view specialized medical personnel, manage payroll logs, override base salary contracts, or register a new staff member.
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-x-8 gap-y-4 mt-6 relative z-10 border-t border-white/10 pt-6">
+                        <div>
+                          <p className="text-[10px] text-blue-300 font-bold uppercase tracking-wider font-mono">Active Divisions</p>
+                          <p className="text-2xl font-mono font-black mt-0.5">{DEPARTMENTS.length}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-blue-300 font-bold uppercase tracking-wider font-mono font-mono">Total Active Staff</p>
+                          <p className="text-2xl font-mono font-black mt-0.5">{employees.length}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-blue-300 font-bold uppercase tracking-wider font-mono">Current Month Payroll Done</p>
+                          <p className="text-2xl font-mono font-black mt-0.5 text-emerald-400">
+                            {employees.filter(e => isEmployeePaidInPeriod(e.id, selectedMonth, selectedYear)).length} / {employees.length} Paid
+                          </p>
+                        </div>
+                      </div>
+                      <Building className="absolute -right-16 -bottom-16 text-white/5" size={240} />
+                    </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead>
-                      <tr className="bg-gray-50 text-gray-400 text-xs font-bold uppercase tracking-widest">
-                        <th className="px-6 py-4">Employee</th>
-                        <th className="px-6 py-4">Specialty & Role</th>
-                        <th className="px-6 py-4">Department</th>
-                        <th className="px-6 py-4">Salary Grade</th>
-                        <th className="px-6 py-4">Status</th>
-                        <th className="px-6 py-4 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {filteredEmployees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((emp) => {
-                        const isPaid = isEmployeePaidInPeriod(emp.id, selectedMonth, selectedYear);
+                    {/* Department Cards Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {DEPARTMENTS.map((deptName) => {
+                        const deptMeta = DEPARTMENT_METADATA[deptName] || { icon: Briefcase, colorClass: 'text-gray-650 bg-gray-50 border-gray-100', gradientClass: 'from-gray-500/5 to-gray-500/0' };
+                        const DeptIcon = deptMeta.icon;
+                        const deptEmps = employees.filter(e => e.department === deptName);
+                        const paidCount = deptEmps.filter(e => isEmployeePaidInPeriod(e.id, selectedMonth, selectedYear)).length;
+                        const pendingCount = deptEmps.length - paidCount;
+                        const progressPercent = deptEmps.length > 0 ? Math.round((paidCount / deptEmps.length) * 100) : 0;
+
+                        // Roles breakdown
+                        const doctors = deptEmps.filter(e => e.role === 'Doctor').length;
+                        const nurses = deptEmps.filter(e => e.role === 'Nurse').length;
+                        const others = deptEmps.length - doctors - nurses;
+
                         return (
-                          <tr 
-                            key={emp.id} 
-                            onClick={() => setViewingEmployeeId(emp.id)}
-                            className={`transition-colors group cursor-pointer ${isPaid ? 'bg-emerald-50 hover:bg-emerald-100/50' : 'hover:bg-blue-50/30'}`}
+                          <motion.div
+                            key={deptName}
+                            whileHover={{ y: -4, scale: 1.01 }}
+                            onClick={() => setSelectedDept(deptName)}
+                            className="bg-white rounded-3xl border border-gray-150 p-6 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group overflow-hidden relative"
                           >
-                            <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${isPaid ? 'bg-emerald-200 text-emerald-700' : 'bg-blue-100 text-blue-600'}`}>
-                                  {emp.name.charAt(0)}
+                            <div className={`absolute inset-0 bg-gradient-to-br ${deptMeta.gradientClass} opacity-100 pointer-events-none`} />
+                            
+                            <div className="relative z-10">
+                              <div className="flex items-start justify-between mb-4">
+                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border ${deptMeta.colorClass} shadow-sm group-hover:scale-110 transition-transform`}>
+                                  <DeptIcon size={24} />
                                 </div>
-                                <div>
-                                  <p className={`font-bold ${isPaid ? 'text-emerald-900' : 'text-gray-800'}`}>{emp.name}</p>
-                                  <p className="text-xs text-gray-500 font-mono">ID: {emp.id}</p>
-                                </div>
+                                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-black font-mono">
+                                  {deptEmps.length} Staff
+                                </span>
                               </div>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="text-sm font-medium text-gray-700">{emp.role}</span>
-                              <p className="text-xs text-gray-400 italic">
-                                {emp.specialty !== 'None' ? emp.specialty : 'General'}
-                              </p>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
-                                {emp.department}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4">
-                              <span className="text-sm font-mono text-blue-600 font-semibold">{emp.payGradeId}</span>
-                            </td>
-                            <td className="px-6 py-4">
-                              {isPaid ? (
-                                <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
-                                  <span className="w-2 h-2 rounded-full bg-emerald-500" /> Paid
+
+                              <h4 className="text-base font-bold text-gray-800 group-hover:text-blue-600 transition-colors mb-2 tracking-tight">
+                                {deptName}
+                              </h4>
+
+                              <div className="flex flex-wrap gap-1 mb-5">
+                                {doctors > 0 && (
+                                  <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-mono">
+                                    {doctors} MDs
+                                  </span>
+                                )}
+                                {nurses > 0 && (
+                                  <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-750 font-mono">
+                                    {nurses} RNs
+                                  </span>
+                                )}
+                                {others > 0 && (
+                                  <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-purple-50 text-purple-700 font-mono">
+                                    {others} Support
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="border-t border-gray-100 pt-4 mt-auto relative z-10">
+                              <div className="flex justify-between items-center text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 font-mono">
+                                <span>PAYROLL STATUS</span>
+                                <span className={pendingCount === 0 ? "text-emerald-600 font-extrabold" : "text-gray-700"}>
+                                  {paidCount}/{deptEmps.length} Paid
                                 </span>
-                              ) : (
-                                <span className="flex items-center gap-1.5 text-xs font-bold text-orange-600">
-                                  <span className="w-2 h-2 rounded-full bg-orange-500" /> Pending
+                              </div>
+                              <div className="w-full h-1.5 bg-gray-150 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full rounded-full transition-all duration-500 ${
+                                    progressPercent === 100 ? 'bg-emerald-500' : 'bg-blue-600'
+                                  }`}
+                                  style={{ width: `${progressPercent}%` }}
+                                />
+                              </div>
+                              <div className="flex justify-between items-center mt-2">
+                                <span className="text-[10px] text-gray-400 font-medium italic">
+                                  {pendingCount > 0 ? `${pendingCount} pending` : 'All complete'}
                                 </span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              <button 
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedEmployeeId(emp.id);
-                                  setCurrentView('payroll');
-                                }}
-                                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all opacity-0 group-hover:opacity-100 ${
-                                  isPaid 
-                                  ? 'bg-emerald-600 text-white' 
-                                  : 'bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white'
-                                }`}
-                              >
-                                {isPaid ? 'View Payslip' : 'Process Payroll'}
-                              </button>
-                            </td>
-                          </tr>
+                                <span className="text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform flex items-center gap-0.5">
+                                  Open <ChevronRight size={12} />
+                                </span>
+                              </div>
+                            </div>
+                          </motion.div>
                         );
                       })}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
-                   <p>Showing <span className="font-bold text-gray-800">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-bold text-gray-800">{Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of <span className="font-bold text-gray-800">{filteredEmployees.length}</span> employees</p>
-                   <div className="flex gap-2">
-                     <button 
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                        disabled={currentPage === 1}
-                        className="px-4 py-2 border border-gray-200 rounded-xl font-bold bg-white hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Previous
-                      </button>
-                     <button 
-                        onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredEmployees.length / itemsPerPage), prev + 1))}
-                        disabled={currentPage >= Math.ceil(filteredEmployees.length / itemsPerPage)}
-                        className="px-4 py-2 border border-gray-200 rounded-xl font-bold bg-white hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Next
-                      </button>
-                   </div>
-                </div>
-              </motion.div>
-            )}
+                    </div>
+                  </motion.div>
+                ) : (
+                  /* 2. List of employees within selected division or global search results */
+                  <motion.div
+                    key={selectedDept || "global-search"}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.2 }}
+                    className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+                  >
+                    {/* Head Banner of division or Search Page */}
+                    <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <button 
+                          onClick={() => {
+                            setSelectedDept(null);
+                            setSearchTerm('');
+                          }}
+                          className="w-10 h-10 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-100 transition-all flex items-center justify-center cursor-pointer hover:scale-105 shadow-sm active:scale-95"
+                          title="Back to Division Directory"
+                        >
+                          <ChevronLeft size={20} />
+                        </button>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {selectedDept ? (
+                              <>
+                                <span className="text-xl font-bold text-gray-900">{selectedDept}</span>
+                                <span className="bg-blue-100 text-blue-800 font-mono text-xs font-bold px-2.5 py-0.5 rounded-full uppercase">
+                                  {filteredEmployees.length} registered
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-xl font-bold text-gray-900">Search Results</span>
+                                <span className="bg-amber-100 text-amber-800 font-mono text-xs font-bold px-2.5 py-0.5 rounded-full uppercase">
+                                  {filteredEmployees.length} matches
+                                </span>
+                              </>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-400 font-medium mt-0.5">
+                            {selectedDept ? `Active personnel registered in internal division folder. Click on any row to calculate payroll or inspect profile files.` : `Clinic staff matching search string "${searchTerm}"`}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 bg-white text-gray-600 shadow-sm">
+                          <Filter size={14} /> Filters
+                        </button>
+                        <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 bg-white text-gray-600 shadow-sm">
+                          <Download size={14} /> Export CSV
+                        </button>
+                        <button 
+                          onClick={handleOpenAddEmployee}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-md shadow-blue-100 hover:bg-blue-700 transition-all hover:scale-105 active:scale-95 cursor-pointer text-xs"
+                        >
+                          <Plus size={16} /> Register Staff
+                        </button>
+                      </div>
+                    </div>
+
+                    {filteredEmployees.length === 0 ? (
+                      <div className="p-16 text-center space-y-4">
+                        <div className="w-16 h-16 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mx-auto border border-gray-100">
+                          <Users size={32} />
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-bold">No Personnel Found</h4>
+                          <p className="text-xs text-gray-500 max-w-sm mx-auto mt-1">There are no clinic personnel files aligning with your filtering parameter. Try clearing your active filters or changing keywords.</p>
+                        </div>
+                        <button 
+                          onClick={() => {
+                            setSelectedDept(null);
+                            setSearchTerm('');
+                          }}
+                          className="px-5 py-2.5 border border-gray-200 text-gray-700 bg-white rounded-xl text-xs font-bold hover:bg-gray-50 cursor-pointer shadow-sm"
+                        >
+                          Return to Groups Directory
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left">
+                            <thead>
+                              <tr className="bg-gray-50/70 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-100">
+                                <th className="px-6 py-4">Employee Name</th>
+                                <th className="px-6 py-4">Specialty & Role</th>
+                                <th className="px-6 py-4">Department division</th>
+                                <th className="px-6 py-4">Salary Grade</th>
+                                <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-4 text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                              {filteredEmployees.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((emp) => {
+                                const isPaid = isEmployeePaidInPeriod(emp.id, selectedMonth, selectedYear);
+                                return (
+                                  <tr 
+                                    key={emp.id} 
+                                    onClick={() => setViewingEmployeeId(emp.id)}
+                                    className={`transition-colors group cursor-pointer ${isPaid ? 'bg-emerald-50/40 hover:bg-emerald-100/40' : 'hover:bg-blue-50/30'}`}
+                                  >
+                                    <td className="px-6 py-4">
+                                      <div className="flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${isPaid ? 'bg-emerald-100 text-emerald-850' : 'bg-blue-100 text-blue-600'}`}>
+                                          {emp.name.charAt(0)}
+                                        </div>
+                                        <div>
+                                          <p className={`font-bold text-sm ${isPaid ? 'text-emerald-950' : 'text-gray-800'}`}>{emp.name}</p>
+                                          <p className="text-[10px] text-gray-400 font-mono tracking-wider">ID: {emp.id}</p>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                      <span className="text-sm font-semibold text-gray-700">{emp.role}</span>
+                                      <p className="text-[11px] text-gray-400 font-medium">
+                                        {emp.specialty !== 'None' ? emp.specialty : 'General'}
+                                      </p>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                      <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-[10px] font-extrabold tracking-wide uppercase font-mono">
+                                        {emp.department}
+                                      </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                      <span className="text-sm font-mono text-blue-600 font-bold">{emp.payGradeId}</span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                      {isPaid ? (
+                                        <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600">
+                                          <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" /> Paid
+                                        </span>
+                                      ) : (
+                                        <span className="flex items-center gap-1.5 text-xs font-bold text-orange-600">
+                                          <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]" /> Pending
+                                        </span>
+                                      )}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                      <button 
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setSelectedEmployeeId(emp.id);
+                                          setCurrentView('payroll');
+                                        }}
+                                        className={`px-4 py-2 rounded-xl text-xs font-black transition-all opacity-0 group-hover:opacity-100 ${
+                                          isPaid 
+                                          ? 'bg-emerald-650 text-white hover:bg-emerald-700' 
+                                          : 'bg-gray-100 text-gray-705 hover:bg-blue-600 hover:text-white hover:shadow-md'
+                                        }`}
+                                      >
+                                        {isPaid ? 'View Payslip' : 'Process Payroll'}
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                        <div className="p-6 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+                           <p>Showing <span className="font-bold text-gray-800">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-bold text-gray-800">{Math.min(currentPage * itemsPerPage, filteredEmployees.length)}</span> of <span className="font-bold text-gray-800">{filteredEmployees.length}</span> personnel matching</p>
+                           <div className="flex gap-2">
+                             <button 
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 border border-gray-200 rounded-xl font-bold bg-white hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              >
+                                Previous
+                              </button>
+                             <button 
+                                onClick={() => setCurrentPage(prev => Math.min(Math.ceil(filteredEmployees.length / itemsPerPage), prev + 1))}
+                                disabled={currentPage >= Math.ceil(filteredEmployees.length / itemsPerPage)}
+                                className="px-4 py-2 border border-gray-200 rounded-xl font-bold bg-white hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              >
+                                Next
+                              </button>
+                           </div>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
 
             {currentView === 'payroll' && (
               <motion.div
