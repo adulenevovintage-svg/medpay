@@ -237,6 +237,27 @@ export const DEPARTMENT_PARAMETERS_CONFIG: Record<string, ParameterConfig[]> = {
   ]
 };
 
+// Dynamically ensure ALL departments have a Deductions and a Salary parameter if they don't have one
+Object.keys(DEPARTMENT_PARAMETERS_CONFIG).forEach(dept => {
+  const configs = DEPARTMENT_PARAMETERS_CONFIG[dept];
+  
+  // Clean duplicates or check presence of deductions parameters
+  const hasDeductions = configs.some(c => 
+    ["deductable", "deduction", "deductions", "penalty"].includes(c.label.trim().toLowerCase())
+  );
+  if (!hasDeductions) {
+    configs.push({ label: "Deductions", multiplier: 1, isFlat: true });
+  }
+
+  // Check presence of salary parameters
+  const hasSalary = configs.some(c => 
+    ["salary", "basic salary", "salary basic", "salary gross", "salary net"].includes(c.label.trim().toLowerCase())
+  );
+  if (!hasSalary) {
+    configs.push({ label: "Salary", multiplier: 1, isFlat: true });
+  }
+});
+
 export const DEPARTMENT_PARAMETERS: Record<string, string[]> = Object.keys(DEPARTMENT_PARAMETERS_CONFIG).reduce((acc, key) => {
   acc[key] = DEPARTMENT_PARAMETERS_CONFIG[key].map(p => p.label);
   return acc;

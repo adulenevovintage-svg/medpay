@@ -37,7 +37,9 @@ import {
   Coins,
   Wrench,
   ChevronLeft,
-  Building
+  Building,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Employee, EmployeeRole, Specialty, MonthlyWorkLog, SalaryCalculation } from './types';
@@ -63,6 +65,14 @@ type View = 'dashboard' | 'employees' | 'payroll' | 'reports';
 
 export default function App() {
   const [isLocked, setIsLocked] = useState(true);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('medpay_theme');
+    return (saved === 'dark' || saved === 'light') ? saved : 'light';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('medpay_theme', theme);
+  }, [theme]);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -265,8 +275,78 @@ export default function App() {
 
   const selectedEmployee = employees.find(e => e.id === selectedEmployeeId);
 
+  const handleExportCSV = () => {
+    const monthName = months[selectedMonth];
+    let csvContent = "";
+    
+    // Header
+    const headers = [
+      "Employee ID",
+      "Employee Name",
+      "Department",
+      "Role",
+      "Specialty",
+      "Salary Grade",
+      "Base Monthly Pay (ETB)",
+      "Dept Modifiers/Bonus (ETB)",
+      "Gross Total (ETB)",
+      "Pension Contribution (ETB)",
+      "Income Tax (ETB)",
+      "Total Net Pay (ETB)",
+      "Status",
+      "Reporting Period"
+    ];
+    csvContent += headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\n";
+    
+    // Row details
+    filteredEmployees.forEach(emp => {
+      const logs = monthlyLogs[emp.id] || [];
+      const log = logs.find(l => l.month === selectedMonth && l.year === selectedYear) || {
+        month: selectedMonth,
+        year: selectedYear,
+        parameters: {},
+        status: 'Draft' as const
+      };
+      
+      const payGrade = PAY_GRADES.find(pg => pg.id === emp.payGradeId) || PAY_GRADES[0];
+      const calc = calculateSalary(log as any, payGrade, emp);
+      
+      const row = [
+        emp.id,
+        emp.name,
+        emp.department,
+        emp.role,
+        emp.specialty,
+        emp.payGradeId,
+        calc.basePay,
+        calc.parametersTotal,
+        calc.totalGross,
+        calc.pensionContribution,
+        calc.incomeTax,
+        calc.totalNet,
+        log.status || 'Draft',
+        `${monthName} ${selectedYear}`
+      ];
+      
+      csvContent += row.map(v => {
+        const str = typeof v === 'number' ? String(v) : (v || '');
+        return `"${str.replace(/"/g, '""')}"`;
+      }).join(",") + "\n";
+    });
+    
+    // Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `MedPay_Payroll_${monthName}_${selectedYear}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className="flex h-screen bg-[#F8FAFC] font-sans text-gray-900 overflow-hidden relative">
+    <div className={`flex h-screen ${theme === 'dark' ? 'dark bg-slate-950 text-slate-100' : 'bg-[#F8FAFC] text-gray-900'} font-sans overflow-hidden relative`}>
       <AnimatePresence>
         {isAddingEmployee && (
           <motion.div 
@@ -488,7 +568,7 @@ export default function App() {
         )}
       </AnimatePresence>
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col gap-8">
+      <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col gap-8 shrink-0 overflow-y-auto">
         <div className="flex items-center gap-3 px-2">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
             <Stethoscope size={24} />
@@ -504,6 +584,19 @@ export default function App() {
         </nav>
 
         <div className="mt-auto pt-6 border-t border-gray-100 flex flex-col gap-2">
+          <button 
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all cursor-pointer ${
+              theme === 'dark' 
+                ? 'bg-slate-800 text-amber-400 hover:bg-slate-700' 
+                : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+            }`}
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+            <span className="font-medium text-sm">
+              {theme === 'dark' ? 'Clinical Light Mode' : 'Clinical Dark Mode'}
+            </span>
+          </button>
           <button className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-100 rounded-xl transition-all">
             <Settings size={20} />
             <span className="font-medium">Settings</span>
@@ -517,7 +610,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto relative">
-        <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-bottom border-gray-200 px-8 py-4 flex items-center justify-between">
+        <header className="sticky top-0 z-30 bg-[#F8FAFC]/95 backdrop-blur-md border-b border-gray-200 px-8 py-4 flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
@@ -783,7 +876,10 @@ export default function App() {
                         <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 bg-white text-gray-600 shadow-sm">
                           <Filter size={14} /> Filters
                         </button>
-                        <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 bg-white text-gray-600 shadow-sm">
+                        <button 
+                          onClick={handleExportCSV}
+                          className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 bg-white text-gray-600 shadow-sm transition-all active:scale-95 cursor-pointer"
+                        >
                           <Download size={14} /> Export CSV
                         </button>
                         <button 
@@ -816,8 +912,8 @@ export default function App() {
                       </div>
                     ) : (
                       <>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left">
+                        <div className="overflow-x-auto w-full">
+                          <table className="w-full text-left min-w-[900px] border-collapse">
                             <thead>
                               <tr className="bg-gray-50/70 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-100">
                                 <th className="px-6 py-4">Employee Name</th>
@@ -1046,6 +1142,7 @@ export default function App() {
           <EmployeeDetailsModal 
             employee={employees.find(e => e.id === viewingEmployeeId)!} 
             onClose={() => setViewingEmployeeId(null)} 
+            monthlyLogs={monthlyLogs}
           />
         )}
       </AnimatePresence>
@@ -1053,8 +1150,58 @@ export default function App() {
   );
 }
 
-function EmployeeDetailsModal({ employee, onClose }: { employee: Employee, onClose: () => void }) {
+function EmployeeDetailsModal({ 
+  employee, 
+  onClose,
+  monthlyLogs
+}: { 
+  employee: Employee, 
+  onClose: () => void,
+  monthlyLogs: Record<string, MonthlyWorkLog[]>
+}) {
   const payGrade = PAY_GRADES.find(pg => pg.id === employee.payGradeId) || PAY_GRADES[0];
+
+  const handleDownloadRecords = () => {
+    const logs = monthlyLogs[employee.id] || [];
+    let csvContent = "";
+    
+    const headers = [
+      "Employee ID", "Employee Name", "Department", "Role", "Specialty", "Salary Grade",
+      "Month", "Year", "Base Salary (ETB)", "Dept Modifiers (ETB)", "Gross Total (ETB)", "Pension (ETB)", "Income Tax (ETB)", "Net Pay (ETB)", "Status"
+    ];
+    csvContent += headers.map(h => `"${h}"`).join(",") + "\n";
+    
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    if (logs.length === 0) {
+      const row = [
+        employee.id, employee.name, employee.department, employee.role, employee.specialty, employee.payGradeId,
+        "N/A", "N/A", employee.baseSalary || 0, 0, employee.baseSalary || 0, 0, 0, employee.baseSalary || 0, "No Logs Registered"
+      ];
+      csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",") + "\n";
+    } else {
+      logs.forEach(log => {
+        const calc = calculateSalary(log, payGrade, employee);
+        const row = [
+          employee.id, employee.name, employee.department, employee.role, employee.specialty, employee.payGradeId,
+          months[log.month], log.year, calc.basePay, calc.parametersTotal, calc.totalGross, calc.pensionContribution, calc.incomeTax, calc.totalNet, log.status
+        ];
+        csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",") + "\n";
+      });
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Payroll_History_${employee.name.replace(/\s+/g, '_')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -1145,12 +1292,15 @@ function EmployeeDetailsModal({ employee, onClose }: { employee: Employee, onClo
           <div className="flex gap-4">
             <button 
               onClick={onClose}
-              className="px-8 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition-all"
+              className="px-8 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-2xl transition-all cursor-pointer text-sm"
             >
               Close Profile
             </button>
             <div className="flex-1" />
-            <button className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-100 transition-all flex items-center gap-2">
+            <button 
+              onClick={handleDownloadRecords}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2 cursor-pointer text-sm active:scale-95"
+            >
               <Download size={18} /> Download Records
             </button>
           </div>
@@ -1244,22 +1394,88 @@ function PayrollForm({
   selectedYear: number,
   existingLogs?: MonthlyWorkLog[]
 }) {
+  const payGrade = useMemo(() => {
+    return PAY_GRADES.find(pg => pg.id === employee.payGradeId) || PAY_GRADES[0];
+  }, [employee.payGradeId]);
+
   const deptParams = useMemo(() => {
     return DEPARTMENT_PARAMETERS[employee.department] || DEPARTMENT_PARAMETERS['Others'] || [];
   }, [employee.department]);
   
-  const [log, setLog] = useState<Omit<MonthlyWorkLog, 'id' | 'employeeId' | 'status'>>({
-    parameters: deptParams.reduce((acc, param) => ({ ...acc, [param]: 0 }), {} as Record<string, number>),
-    month: initialMonth,
-    year: initialYear
+  const baseSalaryKeys = useMemo(() => ["salary", "basic salary", "salary basic", "salary gross", "salary net"], []);
+
+  const [log, setLog] = useState<Omit<MonthlyWorkLog, 'id' | 'employeeId' | 'status'>>(() => {
+    // Try to restore from draft localStorage first
+    const draftKey = `medpay_draft_${employee.id}_${initialMonth}_${initialYear}`;
+    const savedDraft = localStorage.getItem(draftKey);
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        return {
+          parameters: parsed,
+          month: initialMonth,
+          year: initialYear
+        };
+      } catch (e) {
+        console.error("Failed to parse draft", e);
+      }
+    }
+
+    const defaultBasic = employee.baseSalary || payGrade.baseSalary || 0;
+    const initialParams = deptParams.reduce((acc, param) => {
+      const isSalary = baseSalaryKeys.includes(param.trim().toLowerCase());
+      acc[param] = isSalary ? defaultBasic : 0;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      parameters: initialParams,
+      month: initialMonth,
+      year: initialYear
+    };
   });
+
+  const [isSaved, setIsSaved] = useState(true);
+
+  // Auto-save parameters to localStorage
+  useEffect(() => {
+    setIsSaved(false);
+    const draftKey = `medpay_draft_${employee.id}_${log.month}_${log.year}`;
+    localStorage.setItem(draftKey, JSON.stringify(log.parameters));
+    const timeout = setTimeout(() => {
+      setIsSaved(true);
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [log.parameters, log.month, log.year, employee.id]);
 
   // Synced state retrieval if previously saved parameters exist for selected month/year
   useEffect(() => {
+    const draftKey = `medpay_draft_${employee.id}_${log.month}_${log.year}`;
+    const savedDraft = localStorage.getItem(draftKey);
+    let draftParams: Record<string, number> | null = null;
+    if (savedDraft) {
+      try {
+        draftParams = JSON.parse(savedDraft);
+      } catch (e) {
+        console.error("Failed to parse draft in sync", e);
+      }
+    }
+
     const existing = existingLogs.find(l => l.month === log.month && l.year === log.year);
     setLog(prev => {
-      const freshParams = deptParams.reduce((acc, param) => ({ ...acc, [param]: 0 }), {} as Record<string, number>);
-      const mergedParams = existing ? { ...freshParams, ...existing.parameters } : freshParams;
+      const defaultBasic = employee.baseSalary || payGrade.baseSalary || 0;
+      const freshParams = deptParams.reduce((acc, param) => {
+        const isSalary = baseSalaryKeys.includes(param.trim().toLowerCase());
+        acc[param] = isSalary ? defaultBasic : 0;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      let mergedParams = freshParams;
+      if (draftParams) {
+        mergedParams = { ...freshParams, ...draftParams };
+      } else if (existing) {
+        mergedParams = { ...freshParams, ...existing.parameters };
+      }
       
       const isIdentical = Object.keys(freshParams).every(
         k => Number(mergedParams[k] || 0) === Number(prev.parameters[k] || 0)
@@ -1273,21 +1489,342 @@ function PayrollForm({
         parameters: mergedParams
       };
     });
-  }, [log.month, log.year, existingLogs, deptParams]);
+  }, [log.month, log.year, existingLogs, deptParams, employee, payGrade, baseSalaryKeys]);
 
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  const payGrade = PAY_GRADES.find(pg => pg.id === employee.payGradeId) || PAY_GRADES[0];
-  
   const calculation = calculateSalary({
     id: 'temp',
     employeeId: employee.id,
     status: 'Draft',
     ...log
   }, payGrade, employee);
+
+  const customDeductions = Object.keys(log.parameters).reduce((acc, label) => {
+    const isNegative = ["deductable", "deduction", "deductions", "penalty"].includes(label.trim().toLowerCase());
+    if (isNegative) {
+      const val = Number(log.parameters[label]) || 0;
+      return acc + val;
+    }
+    return acc;
+  }, 0);
+
+  const handleDownloadPayslip = () => {
+    const monthName = months[log.month];
+    const reportDate = new Date().toLocaleDateString('en-ET', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    let paramsHtml = "";
+    Object.keys(log.parameters).forEach(paramName => {
+      const val = log.parameters[paramName];
+      const rawVal = Number(val) || 0;
+      if (rawVal !== 0) {
+        const config = (DEPARTMENT_PARAMETERS_CONFIG[employee.department] || []).find(p => p.label === paramName);
+        const multDisplay = config ? (config.isFlat ? 'Flat' : `${config.multiplier}x`) : 'Flat';
+        let payout = 0;
+        if (config) {
+          if (paramName.trim().toLowerCase() === "0.3") {
+            payout = calculation.basePay * config.multiplier;
+          } else if (paramName.trim().toLowerCase() === "topup" && config.multiplier === 0.2) {
+            payout = calculation.basePay * 0.2;
+          } else {
+            const isNegative = ["deductable", "deduction", "deductions", "penalty"].includes(paramName.trim().toLowerCase());
+            const sign = isNegative ? -1 : 1;
+            payout = config.isFlat ? (rawVal * sign) : (rawVal * config.multiplier * sign);
+          }
+        } else {
+          payout = rawVal;
+        }
+
+        paramsHtml += `
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: 500;">${paramName}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #4a5568;">${rawVal.toLocaleString()}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #718096; font-size: 13px;">${multDisplay}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: bold; color: ${payout < 0 ? '#e53e3e' : '#2f855a'};">${payout < 0 ? '-' : ''}ETB ${Math.abs(payout).toLocaleString()}</td>
+          </tr>
+        `;
+      }
+    });
+
+    if (!paramsHtml) {
+      paramsHtml = `
+        <tr>
+          <td colspan="4" style="padding: 20px; text-align: center; color: #a0aec0; font-style: italic;">No additional departmental parameters logged for this period.</td>
+        </tr>
+      `;
+    }
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payroll Slip - ${employee.name}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f7fafc;
+            color: #2d3748;
+        }
+        .container {
+            max-width: 800px;
+            background: white;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            padding: 40px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #3182ce;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .hospital-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #2b6cb0;
+            letter-spacing: -0.5px;
+        }
+        .doc-title {
+            text-align: right;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #718096;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+            background-color: #ebf8ff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #bee3f8;
+        }
+        .info-item {
+            font-size: 14px;
+        }
+        .info-label {
+            font-weight: 700;
+            color: #2c5282;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .table th {
+            background-color: #f7fafc;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #4a5568;
+            border-bottom: 2px solid #edf2f7;
+        }
+        .salary-summary {
+            background-color: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #edf2f7;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .summary-row.bold {
+            font-weight: 700;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 8px;
+            padding-top: 12px;
+            font-size: 16px;
+            color: #1a202c;
+        }
+        .net-pay-block {
+            background-color: #e6fffa;
+            border: 1px solid #b2f5ea;
+            color: #234e52;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .net-title {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .net-value {
+            font-size: 32px;
+            font-weight: 900;
+            font-family: monospace;
+        }
+        .signatures {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px dashed #e2e8f0;
+        }
+        .sig-block {
+            text-align: center;
+        }
+        .sig-line {
+            border-bottom: 1px solid #a0aec0;
+            height: 40px;
+            margin-bottom: 8px;
+        }
+        .sig-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #718096;
+            text-transform: uppercase;
+        }
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; }
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <div class="hospital-title">MEDPAY CLINICAL SERVICES</div>
+                <div style="font-size: 12px; color: #718096; font-weight: 500; margin-top: 4px;">Staff Payroll Voucher & Earning Statement</div>
+            </div>
+            <div>
+                <div class="doc-title">Payslip Receipt</div>
+                <div style="font-size: 12px; font-weight: 700; color: #3182ce; margin-top: 4px;">ID: ${employee.id}-${log.year}${String(log.month + 1).padStart(2, '0')}</div>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Staff Name</div>
+                <div class="info-value">${employee.name}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Pay Period</div>
+                <div class="info-value" style="color: #2b6cb0;">${monthName} ${log.year}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Department</div>
+                <div class="info-value">${employee.department}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Specialty & Role</div>
+                <div class="info-value">${employee.role} • ${employee.specialty !== 'None' ? employee.specialty : 'General'}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Salary Grade</div>
+                <div class="info-value" style="font-family: monospace;">${employee.payGradeId}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Statement Date</div>
+                <div class="info-value">${reportDate}</div>
+            </div>
+        </div>
+
+        <h3 style="font-size: 16px; font-weight: 800; border-bottom: 2px solid #edf2f7; padding-bottom: 8px; margin-bottom: 15px; color: #4a5568;">DEPARTMENT LOGGED PARAMETERS</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width: 40%;">Parameter Label</th>
+                    <th style="width: 20%; text-align: right;">Units/Value</th>
+                    <th style="width: 20%; text-align: right;">Multiplier / Rate</th>
+                    <th style="width: 20%; text-align: right;">Payout Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${paramsHtml}
+            </tbody>
+        </table>
+
+        <h3 style="font-size: 16px; font-weight: 800; border-bottom: 2px solid #edf2f7; padding-bottom: 8px; margin-bottom: 15px; color: #4a5568;">SALARY BREAKDOWN SUMMARY</h3>
+        <div class="salary-summary">
+            <div class="summary-row">
+                <span style="color: #718096; font-weight: 600;">Basic Monthly Salary Reference:</span>
+                <span style="font-family: monospace; font-weight: 700;">ETB ${calculation.basePay.toLocaleString()}</span>
+            </div>
+            <div class="summary-row">
+                <span style="color: #718096; font-weight: 600;">Total Department Additions/Adjustments:</span>
+                <span style="font-family: monospace; font-weight: 700; color: #2f855a;">+ETB ${calculation.parametersTotal.toLocaleString()}</span>
+            </div>
+            <div class="summary-row" style="border-top: 1px solid #edf2f7; padding-top: 12px; font-weight: 700;">
+                <span style="color: #4a5568;">Total Gross Income:</span>
+                <span style="font-family: monospace;">ETB ${calculation.totalGross.toLocaleString()}</span>
+            </div>
+            
+            ${calculation.deductions > 0 ? `
+            <div class="summary-row" style="color: #e53e3e; margin-top: 8px;">
+                <span style="font-weight: 600;">Deductions (Pension & Income Tax Summary):</span>
+                <span style="font-family: monospace; font-weight: 700;">-ETB ${calculation.deductions.toLocaleString()}</span>
+            </div>
+            ` : ''}
+        </div>
+
+        <div class="net-pay-block">
+            <div class="net-title">Total Net Disbursement Payable</div>
+            <div class="net-value">ETB ${calculation.totalNet.toLocaleString()}</div>
+        </div>
+
+        <div class="signatures">
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">Prepared By (Payroll Officer)</div>
+            </div>
+            <div class="sig-block">
+                <div class="sig-line"></div>
+                <div class="sig-label">Received By (Employee Signature)</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 60px;">
+            <button onclick="window.print()" style="background-color: #3182ce; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">Print This Statement</button>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `Payslip_Form_${employee.name.replace(/\s+/g, '_')}_${monthName}_${log.year}.html`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
@@ -1359,6 +1896,20 @@ function PayrollForm({
                   ))}
                </div>
             </div>
+            {/* Real-time Draft Auto-save Indicator */}
+            <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase transition-all duration-300 border-t border-gray-100/50 pt-3">
+              {isSaved ? (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse" />
+                  <span className="text-emerald-500 dark:text-emerald-400">Draft Auto-Saved to Clinic Terminal</span>
+                </>
+              ) : (
+                <>
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)] animate-spin" />
+                  <span className="text-amber-500 animate-pulse">Syncing draft terminal...</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1373,8 +1924,15 @@ function PayrollForm({
              
              <div className="pt-2 space-y-1">
                <div className="flex justify-between text-[11px] text-gray-500 uppercase font-bold px-1">Deductions Detail</div>
-               <CalcRow label="Employee Pension (7%)" value={-calculation.pensionContribution} isNegative />
-               <CalcRow label="Income Tax" value={-calculation.incomeTax} isNegative />
+               {calculation.pensionContribution > 0 && (
+                 <CalcRow label="Employee Pension (7%)" value={-calculation.pensionContribution} isNegative />
+               )}
+               {calculation.incomeTax > 0 && (
+                 <CalcRow label="Income Tax" value={-calculation.incomeTax} isNegative />
+               )}
+               {customDeductions > 0 && (
+                 <CalcRow label="Custom Deductions" value={-customDeductions} isNegative />
+               )}
              </div>
           </div>
 
@@ -1389,16 +1947,25 @@ function PayrollForm({
           <div className="flex gap-3 pt-4">
             <button 
               onClick={onCancel}
-              className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-all text-sm"
+              className="px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold transition-all text-sm cursor-pointer"
             >
               Back
             </button>
             <button 
+              onClick={handleDownloadPayslip}
+              className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold font-sans transition-all text-sm flex items-center gap-2 cursor-pointer border-none shadow active:scale-95"
+              title="Download print-ready Payslip Form"
+            >
+              <Download size={16} /> Payslip Form
+            </button>
+            <button 
               onClick={() => {
+                const draftKey = `medpay_draft_${employee.id}_${log.month}_${log.year}`;
+                localStorage.removeItem(draftKey);
                 alert(`Payroll finalized for ${employee.name}. Monthly records updated.`);
                 onSave(log);
               }}
-              className="px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white rounded-xl font-bold flex-1 transition-all"
+              className="px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white rounded-xl font-bold flex-1 transition-all text-sm cursor-pointer"
             >
               Approve & Pay
             </button>
